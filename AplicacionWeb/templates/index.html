@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Spotify History CRUD</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #000000; }
+        h1 { color: #1DB954; }
+        h3 { color: #ffffff; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgb(87, 87, 87); color: white;}
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+        th { background-color: #333; color: white; }
+        .form-box { background: rgb(87, 87, 87); padding: 20px; border: 1px solid #878787; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, select { background-color: #000000; color: white; padding: 8px; margin-right: 10px; border: 1px solid #000000; border-radius: 4px; }
+        button { padding: 8px 15px; background-color: #1DB954; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #1ed760; }
+        .btn-delete { color: red; text-decoration: none; font-weight: bold; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>🎧 Gestor de Reproducciones</h1>
+
+    <div class="form-box">
+        <h3>Agregar Nueva Canción</h3>
+        <form action="/crear" method="POST">
+            <input type="text" name="track_name" placeholder="Nombre de la Canción" required>
+            <input type="text" name="artist_name" placeholder="Artista" required>
+            <select name="platform">
+                <option value="iOS">iOS</option>
+                <option value="Android">Android</option>
+                <option value="Desktop">Desktop</option>
+            </select>
+            <select name="skipped">
+                <option value="FALSE">Completa</option>
+                <option value="TRUE">Saltada</option>
+            </select>
+            <button type="submit">Guardar Registro</button>
+        </form>
+    </div>
+
+    <h3>Últimos Registros (Muestra)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID (Key)</th>
+                <th>Canción</th>
+                <th>Artista</th>
+                <th>Plataforma</th>
+                <th>¿Saltada?</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in canciones %}
+            <tr>
+                <td><b>{{ c.short_id }}</b> <br><small style="color:rgb(255, 255, 255)">{{ c.full_id }}</small></td>
+                <td>{{ c.track_name }}</td>
+                <td>{{ c.artist_name }}</td>
+                <td>{{ c.platform }}</td>
+                <td>
+                    {% if c.skipped == 'TRUE' %}
+                        <span style="color:orange">Saltada</span>
+                    {% else %}
+                        <span style="color:rgb(0, 187, 0)">Completa</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/borrar/{{ c.full_id }}" class="btn-delete" onclick="return confirm('¿Seguro?');">Borrar</a>
+                    
+                    <form action="/actualizar" method="POST" style="display:inline;">
+                        <input type="hidden" name="full_id" value="{{ c.full_id }}">
+                        <input type="hidden" name="skipped" value="{% if c.skipped == 'TRUE' %}FALSE{% else %}TRUE{% endif %}">
+                        <button type="submit" style="background:#977834; font-size:0.8em;">
+                            Cambiar Estado
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
