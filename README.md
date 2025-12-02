@@ -52,3 +52,26 @@ Se utiliza `HSET` (que funciona como Upsert) para modificar un solo campo.
 Se utilizan `DEL` y `ZREM` para una eliminación limpia.
 `DEL repro:1732985000000`
 **Descripción:** Elimina físicamente la llave y su contenido de la memoria de Redis. El backend también ejecuta ZREM para quitarla del índice.
+
+## Descripción de Archivos
+
+A continuación se detalla la función de cada componente del código fuente:
+
+* **`app.py`**: Es el núcleo de la aplicación (Backend). Inicia el servidor web con Flask, gestiona la conexión segura con Redis Cloud y contiene las funciones lógicas para ejecutar las operaciones CRUD (Crear, Leer, Actualizar, Borrar) solicitadas por el usuario desde el navegador.
+* **`migrarCloud.py`**: Script de utilidad diseñado para la migración de datos. Se encarga de leer el dataset original (CSV), procesarlo y subirlo masivamente a la nube utilizando *Pipelines* de Redis para optimizar el tiempo de transferencia.
+* **`ordenar.py`**: Script auxiliar encargado de la indexación. Su función es recorrer los datos desordenados y generar un "Sorted Set" (Índice ordenado) en Redis, lo que permite recuperar y visualizar las canciones cronológicamente.
+* **`requirements.txt`**: Archivo de configuración de dependencias. Lista las librerías necesarias (Flask, Redis, Gunicorn, Pandas) para que la plataforma de despliegue (Render) sepa qué instalar para hacer funcionar la aplicación.
+* **`templates/index.html`**: Representa la capa de presentación (Frontend). Es el archivo HTML que estructura la interfaz gráfica, mostrando la tabla de reproducciones y los formularios para ingresar o modificar datos.
+
+## Observaciones
+
+**Limitaciones de Infraestructura (Memoria):**
+Es importante notar que el dataset original consta de aproximadamente 150,000 registros. Sin embargo, debido a que el servicio de **Redis Cloud en su capa gratuita (Free Tier)** impone un límite de memoria de trabajo de 30MB, no fue posible cargar la base de datos en su totalidad. El proyecto opera con una muestra significativa de los datos que se ajusta a este límite para garantizar la estabilidad y rendimiento del servidor sin incurrir en costos.
+
+**Lógica de Inserción y Consistencia de IDs:**
+Dado que Redis es una base de datos NoSQL de tipo Clave-Valor y no posee contadores autoincrementales nativos (como el `AUTO_INCREMENT` de SQL), se implementó una lógica personalizada para la operación **CREATE**:
+1.  Antes de insertar, el sistema consulta el índice para identificar cuál es la llave del **último dato registrado**.
+2.  Extrae el ID numérico de esa llave y le suma `1`.
+3.  Utiliza este nuevo valor para generar la llave del nuevo registro.
+
+Este mecanismo asegura que cada nueva canción tenga un identificador único y secuencial, evitando colisiones o sobrescritura de datos existentes.
