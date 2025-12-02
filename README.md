@@ -66,7 +66,7 @@ A continuación se detalla la función de cada componente del código fuente:
 ## Observaciones
 
 **Limitaciones de Infraestructura (Memoria):**
-Es importante notar que el dataset original consta de aproximadamente 150,000 registros. Sin embargo, debido a que el servicio de **Redis Cloud en su capa gratuita (Free Tier)** impone un límite de memoria de trabajo de 30MB, no fue posible cargar la base de datos en su totalidad. El proyecto opera con una muestra significativa de los datos que se ajusta a este límite para garantizar la estabilidad y rendimiento del servidor sin incurrir en costos.
+Es importante notar que el dataset original consta de aproximadamente 150,000 registros. Sin embargo, debido a que el servicio de **Redis Cloud en su capa gratuita (Free Tier)** impone un límite de memoria de trabajo de 20MB, no fue posible cargar la base de datos en su totalidad. El proyecto opera con una muestra significativa de los datos que se ajusta a este límite para garantizar la estabilidad y rendimiento del servidor sin incurrir en costos.
 
 **Lógica de Inserción y Consistencia de IDs:**
 Dado que Redis es una base de datos NoSQL de tipo Clave-Valor y no posee contadores autoincrementales nativos (como el `AUTO_INCREMENT` de SQL), se implementó una lógica personalizada para la operación **CREATE**:
