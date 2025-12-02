@@ -15,7 +15,7 @@ print("Iniciando indexación... esto puede tardar unos segundos.")
 pipe = db.pipeline()
 count = 0
 
-# 2. Recorremos TODAS las llaves repro:*
+# Recorremos las llaves repro:*
 for key in db.scan_iter(match='repro:*'):
     # Obtenemos solo el campo 'ts' (timestamp)
     ts_string = db.hget(key, 'ts')
@@ -37,4 +37,5 @@ for key in db.scan_iter(match='repro:*'):
             pass
 
 pipe.execute()
+
 print(f"¡Listo! Se ordenaron {count} canciones en el índice 'timeline_repros'.")
