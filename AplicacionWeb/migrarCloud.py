@@ -3,8 +3,6 @@ import pandas as pd
 import dateutil.parser
 import time
 
-# --- 1. CONFIGURACIÓN REDIS CLOUD ---
-# Ya puse aquí tus credenciales exactas
 REDIS_HOST = 'redis-15209.c11.us-east-1-2.ec2.cloud.redislabs.com'
 REDIS_PORT = 15209
 REDIS_PASSWORD = 'pgop5DYncOMRfxKuxkvTwC8DqS8UgdNY'
@@ -26,7 +24,6 @@ except Exception as e:
 # --- 2. LEER EL CSV ---
 print("[INFO] Leyendo CSV...")
 
-# IMPORTANTE: Asegurate de que el archivo se llame asi o cambia el nombre abajo
 nombre_archivo = 'spotify_history.csv' 
 
 try:
@@ -42,10 +39,10 @@ pipe = r.pipeline()
 contador_lote = 0
 
 for index, row in df.iterrows():
-    # A. Generamos la llave única
+    # Generamos la llave única
     key = f"repro:{index}"
     
-    # B. Convertimos fecha para el indice
+    # Convertimos fecha para el indice
     try:
         ts_str = row['ts']
         dt_object = dateutil.parser.parse(ts_str)
@@ -54,7 +51,7 @@ for index, row in df.iterrows():
         score = 0
         ts_str = "Desconocido"
 
-    # C. Preparamos datos (Todo a String)
+    # Preparamos datos (Todo a String)
     datos_cancion = {
         "track_name": str(row.get('track_name', '')),
         "artist_name": str(row.get('artist_name', '')),
@@ -64,7 +61,7 @@ for index, row in df.iterrows():
         "full_id": key
     }
     
-    # D. Agregamos a la tuberia
+    # Agregamos a la tabla hash
     pipe.hset(key, mapping=datos_cancion)
     pipe.zadd('timeline_repros', {key: score})
     
@@ -78,4 +75,5 @@ for index, row in df.iterrows():
 
 # Ejecutar los restantes
 pipe.execute()
+
 print("[FIN] Carga terminada. Todos los datos estan en la nube.")
