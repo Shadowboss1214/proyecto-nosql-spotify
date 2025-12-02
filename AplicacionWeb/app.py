@@ -35,19 +35,18 @@ def crear():
         new_id = int(ultimo_id)
         key = f"repro:{new_id}"
     
-    # Obtenemos la fecha actual en formato ISO (como tus datos originales)
+    # Obtenemos la fecha actual en formato ISO
     ahora_iso = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-    ahora_score = time.time() # Tiempo numérico para el índice
+    ahora_score = time.time()
     
     datos = {
         "track_name": request.form['track_name'],
         "artist_name": request.form['artist_name'],
         "platform": request.form['platform'],
         "skipped": request.form['skipped'],
-        "ts": ahora_iso # Importante guardar el TS
+        "ts": ahora_iso # Constructor
     }
     
-    #Guardar los datos (Hash)
     db.hset(key, mapping=datos)
     
     #Actualizar el INDICE (ZSet) para que aparezca arriba
@@ -60,7 +59,7 @@ def crear():
 def borrar(key):
     # Borramos el dato
     db.delete(key)
-    # Borramos también del índice para que deje de salir en la lista
+    # Borramos también del índice
     db.zrem('timeline_repros', key)
     return redirect(url_for('index'))
 
@@ -73,4 +72,5 @@ def actualizar():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
+
     app.run(debug=True)
